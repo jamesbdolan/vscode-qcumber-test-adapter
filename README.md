@@ -1,4 +1,4 @@
-# Example Test Adapter for Visual Studio Code
+# QCumber Test Adapter for Visual Studio Code
 
 This repository contains an example for implementing a `TestAdapter` extension that works with the
 [Test Explorer](https://marketplace.visualstudio.com/items?itemName=hbenl.vscode-test-explorer) extension.
@@ -15,9 +15,9 @@ More documentation can be found in the [Test Adapter API repository](https://git
 
 You should now see a second VS Code window, the Extension Development Host.
 Open a folder in this window and click the "Test" icon in the Activity bar.
-Now you should see the fake example test suite in the side panel:
+Now you should see the fake qcumber test suite in the side panel:
 
-![The fake example test suite](img/fake-tests.png)
+![The fake qcumber test suite](img/fake-tests.png)
 
 ## Basic implementation
 
@@ -27,7 +27,7 @@ Now you should see the fake example test suite in the side panel:
 
 ## Getting ready to publish
 
-* search for all occurrences of the word "example" in this project and replace them with the name of the testing framework that your Test Adapter supports
+* search for all occurrences of the word "example" in this project and replace them with the name of the testing framework that your Test Adapter supports 
 * update `package.json` with your preferred values (at a minimum you should change `author`, `publisher`, `homepage`, `repository` and `bugs`)
 * create an icon for your Test Adapter (there's an SVG version of the Test Explorer icon at `img/test-explorer.svg`) and reference it in `package.json`
 * replace this README with your documentation

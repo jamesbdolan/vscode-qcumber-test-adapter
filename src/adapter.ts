@@ -7,7 +7,7 @@ import { loadFakeTests, runFakeTests } from './fakeTests';
  * This class is intended as a starting point for implementing a "real" TestAdapter.
  * The file `README.md` contains further instructions.
  */
-export class ExampleAdapter implements TestAdapter {
+export class QCumberAdapter implements TestAdapter {
 
 	private disposables: { dispose(): void }[] = [];
 
@@ -24,7 +24,7 @@ export class ExampleAdapter implements TestAdapter {
 		private readonly log: Log
 	) {
 
-		this.log.info('Initializing example adapter');
+		this.log.info('Initializing qcumber adapter');
 
 		this.disposables.push(this.testsEmitter);
 		this.disposables.push(this.testStatesEmitter);
@@ -34,7 +34,7 @@ export class ExampleAdapter implements TestAdapter {
 
 	async load(): Promise<void> {
 
-		this.log.info('Loading example tests');
+		this.log.info('Loading qcumber tests');
 
 		this.testsEmitter.fire(<TestLoadStartedEvent>{ type: 'started' });
 
@@ -46,7 +46,7 @@ export class ExampleAdapter implements TestAdapter {
 
 	async run(tests: string[]): Promise<void> {
 
-		this.log.info(`Running example tests ${JSON.stringify(tests)}`);
+		this.log.info(`Running qcumber tests ${JSON.stringify(tests)}`);
 
 		this.testStatesEmitter.fire(<TestRunStartedEvent>{ type: 'started', tests });
 
