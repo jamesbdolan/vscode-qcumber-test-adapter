@@ -73,7 +73,7 @@
           "scope": "resource"
         },
         "qcumberTestExplorer.command": {
-          "markdownDescription": "Define the command to run QCumber tests with, for example `bundle exec rspec`, `spring rspec`, or `rspec`.",
+          "markdownDescription": "Define the command to run QCumber tests with",
           "default": "docker exec -t q-views qcumber.sh",
           "type": "string",
           "scope": "resource"
