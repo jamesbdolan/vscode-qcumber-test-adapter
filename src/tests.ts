@@ -9,7 +9,7 @@ const qcumberTestSuite: TestSuiteInfo = {
 		{
 			type: 'suite',
 			id: 'nested',
-			label: 'Nested suite',
+			label: 'Nested sweet',
 			children: [
 				{
 					type: 'test',
@@ -36,11 +36,11 @@ const qcumberTestSuite: TestSuiteInfo = {
 	]
 };
 
-export function loadQCumberTests(): Promise<TestSuiteInfo> {
+export function loadTests(): Promise<TestSuiteInfo> {
 	return Promise.resolve<TestSuiteInfo>(qcumberTestSuite);
 }
 
-export async function runQCumberTests(
+export async function runTests(
 	tests: string[],
 	testStatesEmitter: vscode.EventEmitter<TestRunStartedEvent | TestRunFinishedEvent | TestSuiteEvent | TestEvent>
 ): Promise<void> {

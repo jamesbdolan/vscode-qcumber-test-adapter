@@ -20,7 +20,10 @@
   ],
   "keywords": [
     "test",
-    "testing"
+    "testing",
+    "qcumber",
+    "test explorer",
+    "kdb testing"
   ],
   "main": "out/main.js",
   "scripts": {
@@ -33,11 +36,13 @@
   },
   "dependencies": {
     "tslib": "^1.9.3",
+    "split2": "^3.2.2",
     "vscode-test-adapter-api": "^1.7.0",
     "vscode-test-adapter-util": "^0.7.0"
   },
   "devDependencies": {
     "@types/vscode": "~1.23.0",
+    "@types/split2": "^2.1.6",
     "typescript": "^3.5.3",
     "vsce": "^1.65.0"
   },
@@ -48,7 +53,9 @@
     "hbenl.vscode-test-explorer"
   ],
   "activationEvents": [
-    "*"
+    "onLanguage:q",
+    "workspaceContains:**/*.quke",
+    "workspaceContains:**/*.q"
   ],
   "contributes": {
     "configuration": {
@@ -62,6 +69,41 @@
         },
         "qcumberExplorer.logfile": {
           "description": "write diagnostic logs to the given file",
+          "type": "string",
+          "scope": "resource"
+        },
+        "qcumberTestExplorer.command": {
+          "markdownDescription": "Define the command to run QCumber tests with, for example `bundle exec rspec`, `spring rspec`, or `rspec`.",
+          "default": "docker exec -t q-views qcumber.sh",
+          "type": "string",
+          "scope": "resource"
+        },
+        "qcumberTestExplorer.directory": {
+          "markdownDescription": "The location of your QCumber directory relative to the root of the workspace.",
+          "default": "./build/q/services/kdb-views/reports/",
+          "type": "string",
+          "scope": "resource"
+        },
+        "qcumberTestExplorer.filePattern": {
+          "markdownDescription": "The naming pattern for your tests.",
+          "default": [
+            "*.quke"
+          ],
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "scope": "resource"
+        },
+        "qcumberTestExplorer.debuggerHost": {
+          "markdownDescription": "The host to connect the debugger to.",
+          "default": "127.0.0.1",
+          "type": "string",
+          "scope": "resource"
+        },
+        "qcumberTestExplorer.debuggerPort": {
+          "markdownDescription": "The port to connect the debugger to.",
+          "default": "1234",
           "type": "string",
           "scope": "resource"
         }

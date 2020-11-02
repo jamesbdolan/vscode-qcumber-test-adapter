@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TestAdapter, TestLoadStartedEvent, TestLoadFinishedEvent, TestRunStartedEvent, TestRunFinishedEvent, TestSuiteEvent, TestEvent } from 'vscode-test-adapter-api';
 import { Log } from 'vscode-test-adapter-util';
-import { loadQCumberTests, runQCumberTests } from './core';
+import { loadTests, runTests } from './tests';
 
 /**
  * This class is intended as a starting point for implementing a "real" TestAdapter.
@@ -38,7 +38,7 @@ export class QCumberAdapter implements TestAdapter {
 
 		this.testsEmitter.fire(<TestLoadStartedEvent>{ type: 'started' });
 
-		const loadedTests = await loadQCumberTests();
+		const loadedTests = await loadTests();
 
 		this.testsEmitter.fire(<TestLoadFinishedEvent>{ type: 'finished', suite: loadedTests });
 
@@ -51,7 +51,7 @@ export class QCumberAdapter implements TestAdapter {
 		this.testStatesEmitter.fire(<TestRunStartedEvent>{ type: 'started', tests });
 
 		// in a "real" TestAdapter this would start a test run in a child process
-		await runQCumberTests(tests, this.testStatesEmitter);
+		await runTests(tests, this.testStatesEmitter);
 
 		this.testStatesEmitter.fire(<TestRunFinishedEvent>{ type: 'finished' });
 
