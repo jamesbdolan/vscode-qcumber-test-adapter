@@ -33,8 +33,8 @@ export class QCumberAdapter implements TestAdapter {
   async load(): Promise<void> {
     this.log.info('Loading QCumber tests...');
     this.testsEmitter.fire(<TestLoadStartedEvent>{ type: 'started' });
-    this.log.info('Loading RSpec tests...');
-    this.testsInstance = new RspecTests(this.context, this.testStatesEmitter, this.log, this.workspace);
+    this.log.info('Loading QCumber tests...');
+    this.testsInstance = new Tests(this.context, this.testStatesEmitter, this.log, this.workspace);
     const loadedTests = await this.testsInstance.loadTests();
     this.testsEmitter.fire(<TestLoadFinishedEvent>{ type: 'finished', suite: loadedTests });
   }
@@ -43,7 +43,7 @@ export class QCumberAdapter implements TestAdapter {
     this.log.info(`Running QCumber tests ${JSON.stringify(tests)}`);
     this.testStatesEmitter.fire(<TestRunStartedEvent>{ type: 'started', tests });
     if (!this.testsInstance) {
-        this.testsInstance = new RspecTests(this.context, this.testStatesEmitter, this.log, this.workspace);
+        this.testsInstance = new Tests(this.context, this.testStatesEmitter, this.log, this.workspace);
     }
     if (this.testsInstance) {
       await this.testsInstance.runTests(tests, debuggerConfig);
@@ -153,7 +153,7 @@ export class QCumberAdapter implements TestAdapter {
       if (filename.startsWith(this.workspace.uri.fsPath)) {
         // relativeFilename is in the format of, e.g. './app/javascript/src/components/library.vue'.
         let relativeFilename = filename.replace(`${this.workspace.uri.fsPath}`, '.');
-        let testDirectory = (vscode.workspace.getConfiguration('qcumberExplorer', null).get('rspecDirectory') as string) || './spec/';
+        let testDirectory = (vscode.workspace.getConfiguration('qcumberExplorer', null).get('directory') as string) || './spec/';
 
         // In the case that there's no configured test directory, we shouldn't try to reload the tests.
         if (testDirectory !== '' && relativeFilename.startsWith(testDirectory)) {
