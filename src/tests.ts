@@ -4,14 +4,13 @@ import * as childProcess from 'child_process';
 import * as split2 from 'split2';
 import { Log } from 'vscode-test-adapter-util';
 
-export abstract class Tests {
+export class Tests {
   protected context: vscode.ExtensionContext;
   protected testStatesEmitter: vscode.EventEmitter<TestRunStartedEvent | TestRunFinishedEvent | TestSuiteEvent | TestEvent>;
   protected currentChildProcess: childProcess.ChildProcess | undefined;
   protected log: Log;
   protected testSuite: TestSuiteInfo | undefined;
   protected workspace: vscode.WorkspaceFolder;
-  abstract testFrameworkName: string;
   protected debugCommandStartedResolver: Function | undefined;
 
   /**
@@ -359,7 +358,7 @@ export abstract class Tests {
     let rootTestSuite: TestSuiteInfo = {
       type: 'suite',
       id: 'root',
-      label: `${this.workspace.name} ${this.testFrameworkName}`,
+      label: `${this.workspace.name}`,
       children: []
     };
 
