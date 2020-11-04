@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TestSuiteInfo, TestInfo, TestRunStartedEvent, TestRunFinishedEvent, TestSuiteEvent, TestEvent } from 'vscode-test-adapter-api';
 
-const qcumberTestSuite: TestSuiteInfo = {
+const testSuite: TestSuiteInfo = {
 	type: 'suite',
 	id: 'root',
 	label: 'QCumber',
@@ -9,17 +9,17 @@ const qcumberTestSuite: TestSuiteInfo = {
 		{
 			type: 'suite',
 			id: 'nested',
-			label: 'Nested sweet',
+			label: 'src/q/reporting/test/cube_function.quke',
 			children: [
 				{
 					type: 'test',
 					id: 'test1',
-					label: 'Test #1'
+					label: 'count on an atom to return 1'
 				},
 				{
 					type: 'test',
 					id: 'test2',
-					label: 'Test #2'
+					label: 'count of 1 drop list to return n - 1'
 				}
 			]
 		},
@@ -37,7 +37,39 @@ const qcumberTestSuite: TestSuiteInfo = {
 };
 
 export function loadTests(): Promise<TestSuiteInfo> {
-	return Promise.resolve<TestSuiteInfo>(qcumberTestSuite);
+	const output = '[{"namespace":"src/q/building/test","fileName":"build.quke","feature":"","block":"Should","description":"","expectations":"","line":10,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.189472000","time":"0D00:00:00.000000000"},{"namespace":"src/q/building/test","fileName":"build.quke","feature":"","block":"Should","description":"","expectations":"","line":14,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.189573000","time":"0D00:00:00.000000000"},{"namespace":"src/q/building/test","fileName":"build.quke","feature":"","block":"Should","description":"","expectations":"","line":19,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.189798000","time":"0D00:00:00.000000000"},{"namespace":"src/q/core/tests","fileName":"core.quke","feature":"","block":"Should","description":"display number 1 and then 2","expectations":"","line":8,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.191197000","time":"0D00:00:00.000000000"},{"namespace":"src/q/core/tests","fileName":"core.quke","feature":"","block":"Should","description":"display number 1 and then 2","expectations":"","line":13,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.191300000","time":"0D00:00:00.000000000"},{"namespace":"src/q/core/tests","fileName":"core.quke","feature":"","block":"Should","description":"","expectations":"","line":19,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.191449000","time":"0D00:00:00.000000000"},{"namespace":"src/q/reporting/test","fileName":"cube_function.quke","feature":"Count","block":"Should","description":"return the count of its input","expectations":"count on an atom to return 1","line":5,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.192291000","time":"0D00:00:00.000000000"},{"namespace":"src/q/reporting/test","fileName":"cube_function.quke","feature":"Count","block":"Should","description":"return the count of its input","expectations":"count of 1 drop list to return n - 1","line":8,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.192359000","time":"0D00:00:00.000000000"},{"namespace":"src/q/reporting/test","fileName":"cube_latency.quke","feature":"// bench blocks must be wrapped in feature blocks","block":"Bench","description":"","expectations":"NA","line":5,"success":true,"result":{"baseline":"","behaviour":"","baselineError":"","behaviourError":"","passedBaseline":null,"passedTimeLimit":null,"passedLowerTolerance":null,"passedUpperTolerance":null,"timeBehaviour":null,"timeBaseline":null,"timelimit":null},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.193287000","time":""},{"namespace":"src/q/reporting/test","fileName":"cube_latency.quke","feature":"// bench blocks must be wrapped in feature blocks","block":"Bench","description":"// a feature may contain several bench blocks","expectations":"NA","line":10,"success":true,"result":{"baseline":"","behaviour":"","baselineError":"","behaviourError":"","passedBaseline":null,"passedTimeLimit":null,"passedLowerTolerance":null,"passedUpperTolerance":null,"timeBehaviour":null,"timeBaseline":null,"timelimit":100},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.193384000","time":""},{"namespace":"src/q/reporting/test","fileName":"cube_latency.quke","feature":"// bench blocks must be wrapped in feature blocks","block":"Bench","description":"may have a description","expectations":"NA","line":15,"success":true,"result":{"baseline":"","behaviour":"","baselineError":"","behaviourError":"","passedBaseline":null,"passedTimeLimit":null,"passedLowerTolerance":null,"passedUpperTolerance":null,"timeBehaviour":null,"timeBaseline":null,"timelimit":100},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.193508000","time":""}]';
+	let rawTests = JSON.parse(output);
+	//lets give each test an id
+	//var numberOfTests=[...Array(rawTests.length).keys()];
+	rawTests.forEach((rawTest, index) => {
+		rawTest.id = "test" + index;
+		rawTest.type = "test";
+		rawTest.label = rawTest.fileName;
+		//rawTests.push(rawTest);
+	});
+	console.log(rawTests);
+
+	//let testSuite: TestSuiteInfo = await this.getBaseTestSuite(tests);
+	let rootTestSuite: TestSuiteInfo = {
+		type: 'suite',
+		id: 'root',
+		label: 'QCumber',
+		children: []
+	  };
+
+	let testsForSuite: Array<{ type: string; id: string; label: string; }> = [];
+	rawTests.forEach(test => {
+		const singleTest = (({ type, id, label }) => ({ type, id, label }))(test);
+		testsForSuite.push(singleTest);
+	})
+	
+	console.log(testsForSuite);
+	rootTestSuite.children = testsForSuite;
+	console.log(rootTestSuite);
+
+	let testSuite = rootTestSuite;
+	//this.testSuite = testSuite;
+	return Promise.resolve<TestSuiteInfo>(testSuite);
 }
 
 
@@ -46,7 +78,7 @@ export async function runTests(
 	testStatesEmitter: vscode.EventEmitter<TestRunStartedEvent | TestRunFinishedEvent | TestSuiteEvent | TestEvent>
 ): Promise<void> {
 	for (const suiteOrTestId of tests) {
-		const node = findNode(qcumberTestSuite, suiteOrTestId);
+		const node = findNode(testSuite, suiteOrTestId);
 		if (node) {
 			await runNode(node, testStatesEmitter);
 		}

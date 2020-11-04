@@ -31,27 +31,36 @@ export class Tests {
   }
 
   /**
-   * Get the user-configured QCumber command and add file pattern detection.
+   * Get the user-configured QCumber command, if there is one.
    *
    * @return The QCumber command
    */
-  protected getTestCommandWithFilePattern(): string {
-    let command: string = (vscode.workspace.getConfiguration('qcumberExplorer', null).get('command') as string);
-    const dir = this.getTestDirectory();
-    let pattern = this.getFilePattern().map(p => `${dir}/**/${p}`).join(',')
-    command = command || `docker exec -t q-views qcumber.sh`
-    return `${command} --pattern '${pattern}'`;
+  protected getTestInitCommand(): string {
+    //let command: string = (vscode.workspace.getConfiguration('qcumberExplorer', null).get('command') as string);
+    //return command || `docker exec -t q-views lib/ax/qcumberInit.sh && cat build/q/services/kdb-views/reports/qcumberInit.json`
+    return `cat build/q/services/kdb-views/reports/out.json`
   }
+  
+  protected banana = 123;
+  /**
+   * Get the user-configured QCumber command, if there is one.
+   *
+   * @return The QCumber command
+   */
+  protected getTestCommand(): string {
+    let command: string = (vscode.workspace.getConfiguration('qcumberExplorer', null).get('command') as string);
+    return command || `docker exec -t q-views qcumber.sh`
+  }
+
     /**
    * Perform a dry-run of the test suite to get information about every test.
    *
    * @return The raw output from the QCumber JSON formatter.
    */
   initTests = async () => new Promise<string>((resolve, reject) => {
-    let cmd = `${this.getTestCommandWithFilePattern()} --require ${this.context.asAbsolutePath('./custom_formatter.rb')}`
-              + ` --format CustomFormatter --order defined --dry-run`;
+    let cmd = `${this.getTestInitCommand()}`;
 
-    this.log.info(`Running dry-run of QCumber test suite with the following command: ${cmd}`);
+    this.log.info(`Running dry-run (skipping all) of QCumber test suite with the following command: ${cmd}`);
 
     // Allow a buffer of 64MB.
     const execArgs: childProcess.ExecOptions = {
@@ -97,7 +106,9 @@ export class Tests {
    * @return The full test suite.
    */
   public async loadTests(): Promise<TestSuiteInfo> {
-    let output = await this.initTests();
+    //let output = await this.initTests();
+    let output = '[{"namespace":"src/q/reporting/test","fileName":"cube_function.quke","feature":"Count","block":"Should","description":"return the count of its input","expectations":"count on an atom to return 1","line":5,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":false,"parseError":false,"start":"2020-11-03T10:52:06.149307000","time":"0D00:00:00.000017000"},{"namespace":"src/q/reporting/test","fileName":"cube_function.quke","feature":"Count","block":"Should","description":"return the count of its input","expectations":"count of 1 drop list to return n - 1","line":8,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":false,"parseError":false,"start":"2020-11-03T10:52:06.149454000","time":"0D00:00:00.000028000"}]';
+
     this.log.debug('Passing raw output from dry-run into getJsonFromOutput.');
     this.log.debug(`${output}`);
     output = Tests.getJsonFromOutput(output);
@@ -110,14 +121,12 @@ export class Tests {
       this.log.error(`JSON parsing failed: ${error}`);
     }
 
-    let tests: Array<{ id: string; full_description: string; description: string; file_path: string; line_number: number; location: number; }> = [];
+    let tests: Array<{ id: string; fileName: string; namespace: string; line: number;  expectations: string; }> = [];
+    //testMetadata.examples.forEach((test: { id: string; fileName: string; namespace: string; line: number;  expectations: string; }) => {
+    //  test.id = 'root';
+    //  tests.push(test);
+    //});
 
-    testMetadata.examples.forEach((test: { id: string; full_description: string; description: string; file_path: string; line_number: number; location: number; }) => {
-      let test_location_array: Array<string> = test.id.substring(test.id.indexOf("[") + 1, test.id.lastIndexOf("]")).split(':');
-      let test_location_string: string = test_location_array.join('');
-      test.location = parseInt(test_location_string);
-      tests.push(test);
-    });
 
     let testSuite: TestSuiteInfo = await this.getBaseTestSuite(tests);
 
@@ -173,9 +182,9 @@ export class Tests {
   *
   * @return The file pattern
   */
-  getFilePattern(): Array<string> {
-    let pattern: Array<string> = (vscode.workspace.getConfiguration('qcumberExplorer', null).get('filePattern') as Array<string>);
-    return pattern || ['*_test.rb', 'test_*.rb'];
+  getFilePattern(): string {
+    let pattern: string = (vscode.workspace.getConfiguration('qcumberExplorer', null).get('filePattern') as string);
+    return pattern || '*.quke';
   }
 
 
@@ -253,7 +262,7 @@ export class Tests {
    */
   getTestDirectory(): string {
     let directory: string = (vscode.workspace.getConfiguration('qcumberExplorer', null).get('directory') as string);
-    return directory || './spec/';
+    return directory || '/src/q/';
   }
   /**
    * Get the tests in a given file.
@@ -287,7 +296,7 @@ export class Tests {
       currentFileLabel = currentFile.replace(`${this.getTestDirectory()}`, '');
     }
 
-    let pascalCurrentFileLabel = this.snakeToPascalCase(currentFileLabel.replace('_spec.rb', ''));
+    let pascalCurrentFileLabel = this.snakeToPascalCase(currentFileLabel.replace('.quke', ''));
 
     let currentFileTestInfoArray: Array<TestInfo> = currentFileTests.map((test) => {
       // Concatenation of "/Users/username/whatever/project_dir" and "./spec/path/here.rb",
@@ -595,16 +604,6 @@ export class Tests {
       this.testStatesEmitter.fire(<TestEvent>{ type: 'test', test: test.id, state: 'skipped', message: test.pending_message });
     }
   };
-  
-  /**
-   * Get the user-configured QCumber command, if there is one.
-   *
-   * @return The QCumber command
-   */
-  protected getTestCommand(): string {
-    let command: string = (vscode.workspace.getConfiguration('qcumberExplorer', null).get('command') as string);
-    return command || `docker exec -t q-views qcumber.sh`
-  }
 
   /**
    * Get test command with formatter and debugger arguments

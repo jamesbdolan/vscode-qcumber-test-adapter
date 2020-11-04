@@ -36,11 +36,11 @@ const fakeTestSuite: TestSuiteInfo = {
 	]
 };
 
-export function loadFakeTests(): Promise<TestSuiteInfo> {
+export function loadTests(): Promise<TestSuiteInfo> {
 	return Promise.resolve<TestSuiteInfo>(fakeTestSuite);
 }
 
-export async function runFakeTests(
+export async function runTests(
 	tests: string[],
 	testStatesEmitter: vscode.EventEmitter<TestRunStartedEvent | TestRunFinishedEvent | TestSuiteEvent | TestEvent>
 ): Promise<void> {

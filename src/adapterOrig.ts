@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { TestAdapter, TestLoadStartedEvent, TestLoadFinishedEvent, TestRunStartedEvent, TestRunFinishedEvent, TestSuiteEvent, TestEvent } from 'vscode-test-adapter-api';
 import { Log } from 'vscode-test-adapter-util';
-import { Tests } from './tests';
+import { loadTests, runTests } from './testsOrig';
 
 /**
  * This class is intended as a starting point for implementing a "real" TestAdapter.

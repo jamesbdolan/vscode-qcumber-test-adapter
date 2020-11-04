@@ -54,8 +54,7 @@
   ],
   "activationEvents": [
     "onLanguage:q",
-    "workspaceContains:**/*.quke",
-    "workspaceContains:**/*.q"
+    "workspaceContains:**/*.quke"
   ],
   "contributes": {
     "configuration": {
@@ -86,13 +85,8 @@
         },
         "qcumberTestExplorer.filePattern": {
           "markdownDescription": "The naming pattern for your tests.",
-          "default": [
-            "*.quke"
-          ],
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
+          "default": "*.quke",
+          "type": "string",
           "scope": "resource"
         },
         "qcumberTestExplorer.debuggerHost": {
