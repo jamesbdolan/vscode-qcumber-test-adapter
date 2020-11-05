@@ -40,16 +40,15 @@ export function loadTests(): Promise<TestSuiteInfo> {
 	const output = '[{"namespace":"src/q/building/test","fileName":"build.quke","feature":"","block":"Should","description":"","expectations":"","line":10,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.189472000","time":"0D00:00:00.000000000"},{"namespace":"src/q/building/test","fileName":"build.quke","feature":"","block":"Should","description":"","expectations":"","line":14,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.189573000","time":"0D00:00:00.000000000"},{"namespace":"src/q/building/test","fileName":"build.quke","feature":"","block":"Should","description":"","expectations":"","line":19,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.189798000","time":"0D00:00:00.000000000"},{"namespace":"src/q/core/tests","fileName":"core.quke","feature":"","block":"Should","description":"display number 1 and then 2","expectations":"","line":8,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.191197000","time":"0D00:00:00.000000000"},{"namespace":"src/q/core/tests","fileName":"core.quke","feature":"","block":"Should","description":"display number 1 and then 2","expectations":"","line":13,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.191300000","time":"0D00:00:00.000000000"},{"namespace":"src/q/core/tests","fileName":"core.quke","feature":"","block":"Should","description":"","expectations":"","line":19,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.191449000","time":"0D00:00:00.000000000"},{"namespace":"src/q/reporting/test","fileName":"cube_function.quke","feature":"Count","block":"Should","description":"return the count of its input","expectations":"count on an atom to return 1","line":5,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.192291000","time":"0D00:00:00.000000000"},{"namespace":"src/q/reporting/test","fileName":"cube_function.quke","feature":"Count","block":"Should","description":"return the count of its input","expectations":"count of 1 drop list to return n - 1","line":8,"success":true,"result":{"expect":null,"toMatch":null,"expectError":"","toMatchError":""},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.192359000","time":"0D00:00:00.000000000"},{"namespace":"src/q/reporting/test","fileName":"cube_latency.quke","feature":"// bench blocks must be wrapped in feature blocks","block":"Bench","description":"","expectations":"NA","line":5,"success":true,"result":{"baseline":"","behaviour":"","baselineError":"","behaviourError":"","passedBaseline":null,"passedTimeLimit":null,"passedLowerTolerance":null,"passedUpperTolerance":null,"timeBehaviour":null,"timeBaseline":null,"timelimit":null},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.193287000","time":""},{"namespace":"src/q/reporting/test","fileName":"cube_latency.quke","feature":"// bench blocks must be wrapped in feature blocks","block":"Bench","description":"// a feature may contain several bench blocks","expectations":"NA","line":10,"success":true,"result":{"baseline":"","behaviour":"","baselineError":"","behaviourError":"","passedBaseline":null,"passedTimeLimit":null,"passedLowerTolerance":null,"passedUpperTolerance":null,"timeBehaviour":null,"timeBaseline":null,"timelimit":100},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.193384000","time":""},{"namespace":"src/q/reporting/test","fileName":"cube_latency.quke","feature":"// bench blocks must be wrapped in feature blocks","block":"Bench","description":"may have a description","expectations":"NA","line":15,"success":true,"result":{"baseline":"","behaviour":"","baselineError":"","behaviourError":"","passedBaseline":null,"passedTimeLimit":null,"passedLowerTolerance":null,"passedUpperTolerance":null,"timeBehaviour":null,"timeBaseline":null,"timelimit":100},"error":"","aborted":false,"skipped":true,"parseError":false,"start":"2020-11-04T21:26:32.193508000","time":""}]';
 	let rawTests = JSON.parse(output);
 	//lets give each test an id
-	//var numberOfTests=[...Array(rawTests.length).keys()];
 	rawTests.forEach((rawTest, index) => {
-		rawTest.id = "test" + index;
+		rawTest.id = "test" + (index + 1);
 		rawTest.type = "test";
-		rawTest.label = rawTest.fileName;
-		//rawTests.push(rawTest);
+		// I know explicitly adding spaces isn't good style
+		rawTest.label = rawTest.fileName + " - Test " + (index + 1);
 	});
+	console.log('rawTests');
 	console.log(rawTests);
 
-	//let testSuite: TestSuiteInfo = await this.getBaseTestSuite(tests);
 	let rootTestSuite: TestSuiteInfo = {
 		type: 'suite',
 		id: 'root',
@@ -57,14 +56,30 @@ export function loadTests(): Promise<TestSuiteInfo> {
 		children: []
 	  };
 
-	let testsForSuite: Array<{ type: string; id: string; label: string; }> = [];
-	rawTests.forEach(test => {
-		const singleTest = (({ type, id, label }) => ({ type, id, label }))(test);
-		testsForSuite.push(singleTest);
-	})
+	var groupBy = function(array, key) {
+		return array.reduce(function(r, x) {
+			r[x[key]] = r[x[key]] || []; //don't understand this
+			r[x[key]].push(x);
+			return r
+		}, {});
+	};
+	var fileGroup = groupBy(rawTests, 'fileName');
+	//var fileGroupNames = Object.keys(fileGroup);
+	let fileSuite: Array<{ type: string; id: string; label: string; children: Array; }> = [];
+	Object.keys(fileGroup).forEach(key => {
+		let tests = fileGroup[key];
+		let testsForFile: Array<{ type: string; id: string; label: string; }> = [];
+		tests.forEach(test => {
+			const singleTest = (({ type, id, label }) => ({ type, id, label }))(test);
+			testsForFile.push(singleTest);
+		})
+		var s = { type : 'suite', id : 'nested', label : key, children : testsForFile };
+		fileSuite.push(s);
+	});
+	console.log(fileSuite);
 	
-	console.log(testsForSuite);
-	rootTestSuite.children = testsForSuite;
+	rootTestSuite.children = fileSuite;
+	console.log('testSuite');
 	console.log(rootTestSuite);
 
 	let testSuite = rootTestSuite;
