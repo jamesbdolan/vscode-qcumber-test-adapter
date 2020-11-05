@@ -63,22 +63,29 @@ export function loadTests(): Promise<TestSuiteInfo> {
 			return r
 		}, {});
 	};
-	var fileGroup = groupBy(rawTests, 'fileName');
-	//var fileGroupNames = Object.keys(fileGroup);
-	let fileSuite: Array<{ type: string; id: string; label: string; children: Array; }> = [];
-	Object.keys(fileGroup).forEach(key => {
-		let tests = fileGroup[key];
-		let testsForFile: Array<{ type: string; id: string; label: string; }> = [];
-		tests.forEach(test => {
-			const singleTest = (({ type, id, label }) => ({ type, id, label }))(test);
-			testsForFile.push(singleTest);
-		})
-		var s = { type : 'suite', id : 'nested', label : key, children : testsForFile };
-		fileSuite.push(s);
-	});
-	console.log(fileSuite);
-	
-	rootTestSuite.children = fileSuite;
+
+	var moduleGroup = groupBy(rawTests, 'namespace');
+	let moduleSuite: Array<{ type: string; id: string; label: string; children: Array; }> = [];
+	Object.keys(moduleGroup).forEach(key => {
+		let rawTests = moduleGroup[key];
+		var fileGroup = groupBy(rawTests, 'fileName');
+		//var fileGroupNames = Object.keys(fileGroup);
+		let fileSuite: Array<{ type: string; id: string; label: string; children: Array; }> = [];
+		Object.keys(fileGroup).forEach(key => {
+			let tests = fileGroup[key];
+			let testsForFile: Array<{ type: string; id: string; label: string; }> = [];
+			tests.forEach(test => {
+				const singleTest = (({ type, id, label }) => ({ type, id, label }))(test);
+				testsForFile.push(singleTest);
+			})
+			var s = { type : 'suite', id : 'nested', label : key, children : testsForFile };
+			fileSuite.push(s);
+		});
+		var s = { type : 'suite', id : 'nested', label : key, children : fileSuite };
+		moduleSuite.push(s);
+	};
+	console.log(moduleSuite);
+	rootTestSuite.children = moduleSuite;
 	console.log('testSuite');
 	console.log(rootTestSuite);
 
